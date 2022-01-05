@@ -1,5 +1,6 @@
 import {TasksStateType} from "../App";
 import {AddTodoListAT, RemoveTodoListAT} from "./todolists-reducer";
+import {v1} from "uuid";
 
 export type removeTaskAT = {
     type: "REMOVE-TASK"
@@ -27,6 +28,7 @@ export type changedTitleTaskAT = {
     todolistId: string
 }
 
+let initialState: TasksStateType = {}
 
 export type ActionsType =
     removeTaskAT
@@ -36,19 +38,20 @@ export type ActionsType =
     | AddTodoListAT
     | RemoveTodoListAT;
 
-export const tasksReducer = (state: TasksStateType, action: ActionsType): TasksStateType => {
+export const tasksReducer = (state = initialState, action: ActionsType): TasksStateType => {
     switch (action.type) {
-        case "REMOVE-TASK":
-            let copyState = {...state}
-            copyState[action.todolistId] = copyState[action.todolistId].filter(t => t.id != action.taskId)
-            return copyState
+        case "REMOVE-TASK": {
+            let copyState = {...state};
+            copyState[action.todolistId] = copyState[action.todolistId].filter(t => t.id != action.taskId);
+            return copyState;
+        }
         case "ADD-TASK": {
-            let copyState = {...state}
-            let newTask = {id: action.todolistId, title: action.title, isDone: false}
+            let copyState = {...state};
+            let newTask = {id: v1(), title: action.title, isDone: false};
             if (newTask) {
                 copyState[action.todolistId].unshift(newTask)
             }
-            return copyState
+            return copyState;
         }
         case "CHANGE-TASK-STATUS":
             return {
@@ -57,7 +60,7 @@ export const tasksReducer = (state: TasksStateType, action: ActionsType): TasksS
                     if (t.id === action.taskId) return {...t, isDone: action.isDone}
                     else return {...t}
                 })
-            }
+            };
         case "CHANGE-TASK-TITLE":
             return {
                 ...state,
@@ -68,21 +71,21 @@ export const tasksReducer = (state: TasksStateType, action: ActionsType): TasksS
                     }
                     else return {...t}
                 })
-            }
+            };
         case "ADD-TODOLIST":
             return {
                 ...state,
                 [action.todolistId]: []
-            }
+            };
         case "REMOVE-TODOLIST": {
-            let copyState = {...state}
-            delete copyState[action.todoListId]
+            let copyState = {...state};
+            delete copyState[action.todoListId];
             // const {[action.todoListId]: [], ...rest} = state
             // return rest
-            return copyState
+            return copyState;
         }
         default:
-            throw new Error("I don't understand this type")
+            return state;
     }
 }
 
